@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Chirp
- * Plugin URI: http://wordpress.org/extend/plugins/chirp
+ * Plugin URI: https://github.com/spencerfinnell/Chirp
  * Description: Simple Twitter widget. Fork of Wickett Twiter Widget for stand-alone use.
  * Version: 0.1
  * Author: Spencer Finnell
