@@ -165,7 +165,7 @@ class Chirp_Twitter_Widget extends WP_Widget {
 				$display = sprintf( '%1$s <a href="%2$s" class="timesince">%3$s ago</a>', $text, esc_url( "http://twitter.com/{$account}/statuses/{$tweet_id}" ), human_time_diff( strtotime( $tweet[ 'created_at' ] ), current_time( 'timestamp' ) ) ) . "\n";
 	
 				/** default display: {time} {text} */
-				echo apply_filters( 'chirp_tweet', $display, $tweet, $account );
+				echo apply_filters( 'chirp_tweet', $display, $tweet, $text, $account );
 
 				/** item end markup. default: </li> */
 				echo apply_filters( 'chirp_item_end', '</li>', $tweet );
