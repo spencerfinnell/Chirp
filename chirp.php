@@ -84,7 +84,7 @@ class Chirp_Twitter_Widget extends WP_Widget {
 
 		echo $after_title;
 
-		if ( ! $tweets = wp_cache_get( 'stw-' . $this->number , 'widget' ) ) {
+		if ( ! $tweets = wp_cache_get( 'chirp-' . $this->number , 'widget' ) ) {
 			$params = array(
 				'screen_name'      => $account,
 				'trim_user'        => true,
@@ -119,13 +119,13 @@ class Chirp_Twitter_Widget extends WP_Widget {
 					$expire = 300;
 				}
 
-				wp_cache_add( 'stw-' . $this->number, $tweets, 'widget', $expire );
-				wp_cache_add( 'stw-response-code-' . $this->number, $response_code, 'widget', $expire );
+				wp_cache_add( 'chirp-' . $this->number, $tweets, 'widget', $expire );
+				wp_cache_add( 'chirp-response-code-' . $this->number, $response_code, 'widget', $expire );
 			} else {
 				$tweets = 'error';
 				$expire = 300;
 
-				wp_cache_add( 'stw-response-code-' . $this->number, $response_code, 'widget', $expire );
+				wp_cache_add( 'chirp-response-code-' . $this->number, $response_code, 'widget', $expire );
 			}
 		}
 
@@ -184,7 +184,7 @@ class Chirp_Twitter_Widget extends WP_Widget {
 			/** after everything, still inside widget markup */
 			do_action( 'chirp_list_after' );
 		else :
-			if ( 401 == wp_cache_get( 'stw-response-code-' . $this->number , 'widget' ) )
+			if ( 401 == wp_cache_get( 'chirp-response-code-' . $this->number , 'widget' ) )
 				echo '<!-- Twitter widget failed ' . esc_html( sprintf( __( 'Error: Please make sure the Twitter account is <a href="%s">public</a>.'), 'http://support.twitter.com/forums/10711/entries/14016' ) ) . ' -->';
 			else
 				echo '<!-- Twitter widget failed ' . esc_html__( 'Error: Twitter did not respond. Please wait a few minutes and refresh this page.' ) . ' -->';
