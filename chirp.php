@@ -68,8 +68,8 @@ class Chirp_Twitter_Widget extends WP_Widget {
 		$show = absint( $instance[ 'number' ] );
 		$show = $show > 200 ? 200 : $show;
 
-		$hide_replies     = $instance[ 'hide_replies' ];
-		$include_retweets = $instance[ 'include_retweets' ];
+		$hide_replies     = (bool) $instance[ 'hide_replies' ];
+		$include_retweets = (bool) $instance[ 'include_retweets' ];
 
 		$account_url = esc_url( sprintf( 'http://twitter.com/%s', $account ) );
 
@@ -79,8 +79,8 @@ class Chirp_Twitter_Widget extends WP_Widget {
 		/** title */
 		echo $before_title;
 
-			$title = sprintf( '<a href="%1$s">%2$s</a>', $account_url, esc_html( $title ) );
-			echo apply_filters( 'stw_title', $title, $account_url, $title );
+			$title_display = sprintf( '<a href="%1$s">%2$s</a>', $account_url, esc_html( $title ) );
+			echo apply_filters( 'chirp_title', $title_display, $title, $account_url );
 
 		echo $after_title;
 
@@ -91,12 +91,12 @@ class Chirp_Twitter_Widget extends WP_Widget {
 				'include_entities' => false
 			);
 
-			if ( 'yes' == $hide_replies )
+			if ( $hide_replies )
 				$params[ 'exclude_replies' ] = true;
 			else
 				$params[ 'count' ] = $show;
 
-			if ( 'yes' == $include_retweets )
+			if ( $include_retweets )
 				$params[ 'include_rts' ] = true;
 
 			$twitter_json_url = esc_url_raw(
@@ -187,30 +187,36 @@ class Chirp_Twitter_Widget extends WP_Widget {
 			if ( 401 == wp_cache_get( 'stw-response-code-' . $this->number , 'widget' ) )
 				echo '<!-- Twitter widget failed ' . esc_html( sprintf( __( 'Error: Please make sure the Twitter account is <a href="%s">public</a>.'), 'http://support.twitter.com/forums/10711/entries/14016' ) ) . ' -->';
 			else
-				echo '<!-- Twitter widget failed ' . esc_html__('Error: Twitter did not respond. Please wait a few minutes and refresh this page.') . ' -->';
+				echo '<!-- Twitter widget failed ' . esc_html__( 'Error: Twitter did not respond. Please wait a few minutes and refresh this page.' ) . ' -->';
 		endif;
 
 		echo $after_widget;
 	}
 
 	/**
-	 * Deals with the settings when they are saved by the admin. Here is
-	 * where any validation should be dealt with.
+	 * Save and validate settings when the widget is updated.
 	 *
 	 * @since Chirp 0.1
+	 *
+	 * @param array $new_instance The modified settings
+	 * @param array $old_instance The old/saved settings
+	 * @return array $instance The validated settings
 	 */
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		
 		$instance[ 'title' ]            = strip_tags( $new_instance[ 'title' ] );
+
 		$instance[ 'account' ]          = trim( strip_tags( stripslashes( $new_instance[ 'account' ] ) ) );
 		$instance[ 'account' ]          = str_replace( 'http://twitter.com/', '', $instance[ 'account' ] );
 		$instance[ 'account' ]          = str_replace( '/', '', $instance[ 'account' ] );
 		$instance[ 'account' ]          = str_replace( '@', '', $instance[ 'account' ] );
 		$instance[ 'account' ]          = str_replace( '#!', '', $instance[ 'account' ] );
-		$instance[ 'number' ]           = (int) $new_instance[ 'number' ];
-		$instance[ 'hide_replies' ]     = isset( $new_instance[ 'hide_replies' ] ) ? 'yes' : 'no';
-		$instance[ 'include_retweets' ] = isset( $new_instance[ 'include_retweets' ] ) ? 'yes' : 'no';
+
+		$instance[ 'number' ]           = intval( $new_instance[ 'number' ] );
+
+		$instance[ 'hide_replies' ]     = isset( $new_instance[ 'hide_replies' ] );
+		$instance[ 'include_retweets' ] = isset( $new_instance[ 'include_retweets' ] );
 		
 		return $instance;
 	}
@@ -219,13 +225,16 @@ class Chirp_Twitter_Widget extends WP_Widget {
 	 * Displays the form for this widget on the Widgets page of the WP Admin area.
 	 *
 	 * @since Chirp 0.1
+	 *
+	 * @param array $instance The saved settings to be output
+	 * @return void
 	 */
 	function form( $instance ) {
-		$title            = isset( $instance[ 'title' ]) ? esc_attr( $instance[ 'title' ] ) : '';
+		$title            = isset( $instance[ 'title' ] ) ? esc_attr( $instance[ 'title' ] ) : '';
 		$account          = isset( $instance[ 'account' ] ) ? esc_attr( $instance[ 'account' ] ) : '';
-		$number           = isset( $instance[ 'number' ] ) ? absint( $instance[ 'number' ] ) : 5;
-		$hide_replies     = isset( $instance[ 'hide_replies' ] ) && 'yes' == $instance[ 'hide_replies' ] ? true : false;
-		$include_retweets = isset( $instance[ 'include_retweets' ] ) && 'yes' == $instance[ 'include_retweets' ] ? true : false;
+		$number           = isset( $instance[ 'number' ] ) ? intval( $instance[ 'number' ] ) : 5;
+		$hide_replies     = isset( $instance[ 'hide_replies' ] ) && ! empty( $instance[ 'hide_replies' ] ) ? true : false;
+		$include_retweets = isset( $instance[ 'include_retweets' ] ) && ! empty( $instance[ 'include_retweets' ] ) ? true : false;
 ?>
 			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php _e( 'Title:', 'chirp' ); ?></label>
