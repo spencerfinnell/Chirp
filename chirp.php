@@ -155,15 +155,15 @@ class Spencers_Twitter_Widget extends WP_Widget {
 				else
 					$tweet_id = urlencode( $tweet[ 'id' ] );
 
-				do_action( 'stw_item_before' );
+				do_action( 'stw_item_before', $tweet );
 
-				echo apply_filters( 'stw_item_start', '<li>' );
+				echo apply_filters( 'stw_item_start', '<li>', $tweet );
 
-				printf( apply_filters( 'stw_tweet', '%1$s <a href="%2$s" class="timesince">%3$s ago</a>' ), $text, esc_url( "http://twitter.com/{$account}/statuses/{$tweet_id}" ), human_time_diff( strtotime( $tweet[ 'created_at' ] ), current_time( 'timestamp' ) ) );
+				printf( apply_filters( 'stw_tweet', '%1$s <a href="%2$s" class="timesince">%3$s ago</a>', $tweet ), $text, esc_url( "http://twitter.com/{$account}/statuses/{$tweet_id}" ), human_time_diff( strtotime( $tweet[ 'created_at' ] ), current_time( 'timestamp' ) ) );
 
-				echo apply_filters( 'stw_item_end', '</li>' );
+				echo apply_filters( 'stw_item_end', '</li>', $tweet );
 
-				do_action( 'stw_item_after' );
+				do_action( 'stw_item_after', $tweet );
 
 				unset($tweet_id);
 
